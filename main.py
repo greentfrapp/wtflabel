@@ -5,12 +5,25 @@ import torch
 from fastapi import FastAPI, status
 from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 
 import wtflabel
 
 
 app = FastAPI()
+
+
+origins = [
+    "http://localhost:3000",
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 state = None
