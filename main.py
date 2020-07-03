@@ -122,6 +122,11 @@ def validate(user_id: str, sample_ids: Optional[List[int]]):
     return {"acc": acc_est}
 
 
+@app.get("/allUsers")
+def get_all_users():
+    return [k for k in models.keys()]
+
+
 app.mount("/mnist", StaticFiles(directory="mnist", html=True), name="mnist")
 
 
