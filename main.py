@@ -6,6 +6,7 @@ from fastapi import FastAPI, status
 from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import numpy as np
 
 import wtflabel
@@ -32,6 +33,11 @@ mnist, real_labels, img_paths = wtflabel.utils.load_mnist(5000, device)
 models = {}
 datasets = {}
 accuracies = {}
+
+
+class Labels(BaseModel):
+    user_id: str
+    labels: Dict[str, int]
 
 
 @app.get("/")
@@ -87,12 +93,13 @@ def check_user(user_id: str):
     }
 
 
-@app.get("/label")
-def label(labels: Dict[str, float], user_id: str):
+@app.post("/label")
+def label(labels: Labels):
+    user_id = labels.user_id
     user_dataset = datasets[user_id]
-    for sample_id, label in labels.items():
+    for sample_id, label in labels.labels.items():
         user_dataset[int(sample_id)] = label
-    acc_est = validate(user_id, list(labels.keys()))
+    acc_est = validate(user_id, list(labels.labels.keys()))
     accuracies[user_id] *= 0.9
     accuracies[user_id] += 0.1 * acc_est["acc"]
     wtflabel.train.train(
