@@ -99,7 +99,7 @@ def label(labels: Labels):
     user_dataset = datasets[user_id]
     for sample_id, label in labels.labels.items():
         user_dataset[int(sample_id)] = label
-    acc_est = validate(user_id, list(labels.labels.keys()))
+    acc_est = validate(user_id, [int(k) for k in labels.labels.keys()])
     accuracies[user_id] *= 0.9
     accuracies[user_id] += 0.1 * acc_est["acc"]
     wtflabel.train.train(
