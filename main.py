@@ -89,6 +89,8 @@ def check_user(user_id: str):
 
 @app.get("/label")
 def label(labels, user_id: str):
+    print(datasets)
+    print(user_id in datasets)
     user_dataset = datasets[user_id]
     for sample_id, label in labels.items():
         user_dataset[int(sample_id)] = label
