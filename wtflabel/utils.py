@@ -1,6 +1,7 @@
 from collections import Counter
 from pathlib import Path
 import torch
+from torchvision import transforms
 import torch.nn.functional as F
 import numpy as np
 from PIL import Image
@@ -10,7 +11,7 @@ def load_mnist(size=60000, device=torch.device("cpu")):
     folder = Path("mnist/train")
     img_paths = list(folder.glob("*/*.jpg"))
     img_paths = np.random.choice(img_paths, len(img_paths), replace=False)
-    to_tensor = lambda x: torch.tensor(np.array(x))
+    to_tensor = transforms.ToTensor()
     samples_t = []
     labels = []
     for img_path in img_paths:
@@ -32,9 +33,9 @@ def recommend_samples(model, samples, idxs, batchsize=5, max_entropy=True):
     entropies = [entropy(model(samples[i])) for i in idxs]
     sorted_samples = sorted(list(enumerate(entropies)), key=lambda x: -x[1])
     if max_entropy:
-        return [idxs[i[0]] for i in sorted_samples[:batchsize]]
+        return [int(idxs[i[0]]) for i in sorted_samples[:batchsize]]
     else:
-        return [idxs[i[0]] for i in sorted_samples[-batchsize:]]
+        return [int(idxs[i[0]]) for i in sorted_samples[-batchsize:]]
 
 
 def recommend_group(model, samples, idxs, batchsize=9):
