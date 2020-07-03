@@ -10,7 +10,7 @@ def load_mnist(size=60000, device=torch.device("cpu")):
     folder = Path("mnist/train")
     img_paths = list(folder.glob("*/*.jpg"))
     img_paths = np.random.choice(img_paths, len(img_paths), replace=False)
-    to_tensor = torch.tensor
+    to_tensor = lambda x: torch.tensor(np.array(x))
     samples_t = []
     labels = []
     for img_path in img_paths:
