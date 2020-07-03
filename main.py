@@ -78,6 +78,15 @@ def init():
     return {"userId": user_id}
 
 
+@app.get("/checkUser")
+def check_user(user_id: str):
+    return {
+        "model": user_id in models,
+        "dataset": user_id in datasets,
+        "accuracy": user_id in accuracies,
+    }
+
+
 @app.get("/label")
 def label(labels, user_id: str):
     user_dataset = datasets[user_id]
