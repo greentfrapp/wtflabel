@@ -79,10 +79,10 @@ def init():
 
 
 @app.get("/label")
-def label(labels: Dict[int, int], user_id: str):
+def label(labels: Dict[str, int], user_id: str):
     user_dataset = datasets[user_id]
     for sample_id, label in labels.items():
-        user_dataset[sample_id] = label
+        user_dataset[int(sample_id)] = label
     acc_est = validate(user_id, list(labels.keys()))
     accuracies[user_id] *= 0.9
     accuracies[user_id] += 0.1 * acc_est["acc"]
