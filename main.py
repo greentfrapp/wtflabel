@@ -27,7 +27,7 @@ app.add_middleware(
 )
 
 
-state = None
+state = hex(random.getrandbits(128))[2:7]
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 mnist, real_labels, img_paths = wtflabel.utils.load_mnist(5000, device)
 models = {}
@@ -43,9 +43,6 @@ class Labels(BaseModel):
 
 @app.get("/")
 def get_root():
-    global state
-    if state is None:
-        state = hex(random.getrandbits(128))[2:7]
     return {
         "title": "Wow That's Fast Labeling",
         "stateId": state,
@@ -122,7 +119,7 @@ def label(labels: Labels):
 
 
 @app.get("/validate")
-def validate(state:str, user_id: str, sample_ids: Optional[List[int]]):
+def validate(state_id:str, user_id: str, sample_ids: Optional[List[int]]):
     if state_id != state:
         return "Wrong state ID"
     acc_est = wtflabel.train.validate(
