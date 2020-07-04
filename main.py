@@ -64,7 +64,7 @@ def get_samples(state_id:str, user_id: str, batchsize: Optional[int]=5):
 
 
 @app.get("/samplesGroup")
-def get_samples_group(state:str, user_id: str, batchsize: Optional[int]=9):
+def get_samples_group(state_id:str, user_id: str, batchsize: Optional[int]=9):
     if state_id != state:
         return "Wrong state ID"
     candidates = np.random.choice(len(mnist), 100, replace=False)
@@ -87,7 +87,7 @@ def init():
 
 
 @app.get("/checkUser")
-def check_user(state:str, user_id: str):
+def check_user(state_id:str, user_id: str):
     if state_id != state:
         return "Wrong state ID"
     return {
@@ -153,7 +153,7 @@ if __name__ == "__main__":
         if i % 10 == 0:
             tqdm.write(f"Labeled {len(datasets[user_id])} samples...")
             tqdm.write("Estimated Accuracy: {:.2f}%".format(accuracies[user_id] * 100))
-        
+
     print("Sampling 5 groups...")
     for _ in range(5):
         group = get_samples_group(user_id)
