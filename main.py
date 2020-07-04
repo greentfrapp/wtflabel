@@ -36,6 +36,7 @@ accuracies = {}
 
 
 class Labels(BaseModel):
+    state_id: str
     user_id: str
     labels: Dict[str, int]
 
@@ -47,12 +48,14 @@ def get_root():
         state = hex(random.getrandbits(128))[2:7]
     return {
         "title": "Wow That's Fast Labeling",
-        "state": state,
+        "stateId": state,
     }
 
 
 @app.get("/samples")
-def get_samples(user_id: str, batchsize: Optional[int]=5):
+def get_samples(state_id:str, user_id: str, batchsize: Optional[int]=5):
+    if state_id != state:
+        return "Wrong state ID"
     candidates = np.random.choice(len(mnist), 100, replace=False)
     samples = wtflabel.utils.recommend_samples(
         model=models[user_id],
@@ -64,7 +67,9 @@ def get_samples(user_id: str, batchsize: Optional[int]=5):
 
 
 @app.get("/samplesGroup")
-def get_samples_group(user_id: str, batchsize: Optional[int]=9):
+def get_samples_group(state:str, user_id: str, batchsize: Optional[int]=9):
+    if state_id != state:
+        return "Wrong state ID"
     candidates = np.random.choice(len(mnist), 100, replace=False)
     samples, pred_label = wtflabel.utils.recommend_group(
         model=models[user_id],
@@ -81,11 +86,13 @@ def init():
     models[user_id] = wtflabel.models.BasicNet().to(device)
     datasets[user_id] = OrderedDict()
     accuracies[user_id] = 0.1
-    return {"userId": user_id}
+    return {"userId": user_id, "stateId": state}
 
 
 @app.get("/checkUser")
-def check_user(user_id: str):
+def check_user(state:str, user_id: str):
+    if state_id != state:
+        return "Wrong state ID"
     return {
         "model": user_id in models,
         "dataset": user_id in datasets,
@@ -95,6 +102,8 @@ def check_user(user_id: str):
 
 @app.post("/label")
 def label(labels: Labels):
+    if labels.state_id != state:
+        return "Wrong state ID"
     user_id = labels.user_id
     user_dataset = datasets[user_id]
     for sample_id, label in labels.labels.items():
@@ -108,11 +117,14 @@ def label(labels: Labels):
         mnist,
         device=device,
     )
+    print(accuracies[user_id])
     return {"accEst": accuracies[user_id]}
 
 
 @app.get("/validate")
-def validate(user_id: str, sample_ids: Optional[List[int]]):
+def validate(state:str, user_id: str, sample_ids: Optional[List[int]]):
+    if state_id != state:
+        return "Wrong state ID"
     acc_est = wtflabel.train.validate(
         models[user_id],
         datasets[user_id],
@@ -123,7 +135,9 @@ def validate(user_id: str, sample_ids: Optional[List[int]]):
 
 
 @app.get("/allUsers")
-def get_all_users():
+def get_all_users(state:str):
+    if state_id != state:
+        return "Wrong state ID"
     return [k for k in models.keys()]
 
 
