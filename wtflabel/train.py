@@ -29,8 +29,12 @@ def validate(user_model, user_data, dataset, batchsize=5, sample_ids=None):
         xs = [dataset[i] for i in user_data.keys()]
         ys = list(user_data.values())
     else:
-        xs = [dataset[i] for i in sample_ids]
-        ys = [user_data[i] for i in sample_ids]
+        xs = []
+        ys = []
+        for i in sample_ids:
+            if i in user_data:
+                xs.append(dataset[i])
+                ys.append(user_data[i])
     for batch in range(len(xs)//batchsize):
         start = batch * batchsize
         end = start + batchsize
