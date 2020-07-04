@@ -36,7 +36,7 @@ def validate(user_model, user_data, dataset, batchsize=5, sample_ids=None):
             if i in user_data:
                 xs.append(dataset[i])
                 ys.append(user_data[i])
-    for batch in range(len(xs)//batchsize):
+    for batch in range(np.floor(len(xs)/batchsize)):
         start = batch * batchsize
         end = start + batchsize
         logits = user_model(torch.cat(xs[start:end]))

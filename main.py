@@ -99,18 +99,18 @@ def check_user(state:str, user_id: str):
 
 @app.post("/label")
 def label(labels: Labels):
+    user_id = labels.user_id
+    state_id = labels.state_id
     if labels.state_id != state:
         return "Wrong state ID"
-    user_id = labels.user_id
-    user_dataset = datasets[user_id]
     for sample_id, label in labels.labels.items():
-        user_dataset[int(sample_id)] = label
-    acc_est = validate(labels.state_id, user_id, [int(k) for k in labels.labels.keys()])
+        datasets[user_id][int(sample_id)] = label
+    acc_est = validate(state_id, user_id, [int(k) for k in labels.labels.keys()])
     accuracies[user_id] *= 0.9
     accuracies[user_id] += 0.1 * acc_est["acc"]
     wtflabel.train.train(
         models[user_id],
-        user_dataset,
+        datasets[user_id],
         mnist,
         device=device,
     )
