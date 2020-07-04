@@ -40,7 +40,7 @@ def recommend_samples(model, samples, idxs, batchsize=5, max_entropy=True):
 
 def recommend_group(model, samples, idxs, batchsize=9):
     logits = [model(samples[i])[0].cpu().detach().numpy() for i in idxs]
-    predictions = [np.argmax(l) for l in logits]
+    predictions = [int(np.argmax(l)) for l in logits]
     most_freq_label = Counter(predictions).most_common(1)[0][0]
     group = [idxs[i] for i, p in enumerate(predictions) if p == most_freq_label]
     if len(group) > batchsize:
