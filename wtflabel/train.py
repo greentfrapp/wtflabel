@@ -4,6 +4,7 @@ import numpy as np
 
 
 def train(user_model, user_data, dataset, steps=200, batchsize=5, device=torch.device("cpu")):
+    print(user_data)
     xs = list(user_data.keys())
     ys = list(user_data.values())
     optimizer = optim.Adam(user_model.parameters(), lr=0.001)
