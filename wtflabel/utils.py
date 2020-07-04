@@ -44,5 +44,5 @@ def recommend_group(model, samples, idxs, batchsize=9):
     most_freq_label = Counter(predictions).most_common(1)[0][0]
     group = [idxs[i] for i, p in enumerate(predictions) if p == most_freq_label]
     if len(group) > batchsize:
-        group = np.random.choice(group, batchsize, replace=False)
+        group = np.random.choice(group, batchsize, replace=False).tolist()
     return group, most_freq_label
