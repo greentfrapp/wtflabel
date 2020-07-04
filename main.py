@@ -106,8 +106,9 @@ def label(labels: Labels):
     for sample_id, label in labels.labels.items():
         datasets[user_id][int(sample_id)] = label
     acc_est = validate(state_id, user_id, [int(k) for k in labels.labels.keys()])
-    accuracies[user_id] *= 0.9
-    accuracies[user_id] += 0.1 * acc_est["acc"]
+    if acc_est is not None:
+        accuracies[user_id] *= 0.9
+        accuracies[user_id] += 0.1 * acc_est["acc"]
     wtflabel.train.train(
         models[user_id],
         datasets[user_id],

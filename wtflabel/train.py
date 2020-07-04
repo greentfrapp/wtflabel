@@ -36,10 +36,15 @@ def validate(user_model, user_data, dataset, batchsize=5, sample_ids=None):
             if i in user_data:
                 xs.append(dataset[i])
                 ys.append(user_data[i])
-    for batch in range(int(np.floor(len(xs)/batchsize))):
-        start = batch * batchsize
-        end = start + batchsize
+    start = 0
+    end = batchsize
+    while start < len(xs):
         logits = user_model(torch.cat(xs[start:end]))
         pred = np.argmax(logits.detach().cpu().numpy(), axis=1)
         acc.append(np.mean(pred == ys[start:end]))
-    return np.mean(acc)
+        start += batchsize
+        end += batchsize
+    if len(acc):
+        return np.mean(acc)
+    else:
+        return None
