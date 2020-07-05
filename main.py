@@ -32,6 +32,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 mnist, real_labels, img_paths = wtflabel.utils.load_mnist(5000, device)
 models = {}
 datasets = {}
+unseen_samples = {}
 accuracies = {}
 
 
@@ -53,13 +54,15 @@ def get_root():
 def get_samples(state_id:str, user_id: str, batchsize: Optional[int]=5):
     if state_id != state:
         return "Wrong state ID"
-    candidates = np.random.choice(len(mnist), 100, replace=False)
+    candidates = np.random.choice(unseen_samples[user_id], 100, replace=False)
     samples = wtflabel.utils.recommend_samples(
         model=models[user_id],
         samples=mnist,
         idxs=candidates,
         batchsize=batchsize,
     )
+    for s in samples:
+        unseen_samples[user_id].pop(unseen_samples[user_id].index(s))
     return {"samples": list(img_paths[samples]), "sampleIds": samples}
 
 
@@ -67,13 +70,15 @@ def get_samples(state_id:str, user_id: str, batchsize: Optional[int]=5):
 def get_samples_group(state_id:str, user_id: str, batchsize: Optional[int]=9):
     if state_id != state:
         return "Wrong state ID"
-    candidates = np.random.choice(len(mnist), 100, replace=False)
+    candidates = np.random.choice(unseen_samples[user_id], 100, replace=False)
     samples, pred_label = wtflabel.utils.recommend_group(
         model=models[user_id],
         samples=mnist,
         idxs=candidates,
         batchsize=batchsize,
     )
+    for s in samples:
+        unseen_samples[user_id].pop(unseen_samples[user_id].index(s))
     return {"samples": list(img_paths[samples]), "sampleIds": samples, "predLabel": pred_label}
 
 
@@ -83,6 +88,7 @@ def init():
     models[user_id] = wtflabel.models.BasicNet().to(device)
     datasets[user_id] = OrderedDict()
     accuracies[user_id] = 0.1
+    seen_samples[user_id] = []
     return {"userId": user_id, "stateId": state}
 
 
@@ -116,7 +122,7 @@ def label(labels: Labels):
         device=device,
     )
     print(accuracies[user_id])
-    return {"accEst": accuracies[user_id]}
+    return {"accEst": accuracies[user_id], "unseen": len(unseen_samples[user_id])}
 
 
 @app.get("/validate")
