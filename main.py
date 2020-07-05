@@ -88,7 +88,7 @@ def init():
     models[user_id] = wtflabel.models.BasicNet().to(device)
     datasets[user_id] = OrderedDict()
     accuracies[user_id] = 0.1
-    seen_samples[user_id] = []
+    unseen_samples[user_id] = list(range(len(mnist)))
     return {"userId": user_id, "stateId": state}
 
 
