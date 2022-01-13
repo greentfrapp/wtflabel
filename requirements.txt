@@ -1,5 +1,5 @@
 https://download.pytorch.org/whl/cpu/torch-1.0.0-cp37-cp37m-linux_x86_64.whl
-fastapi==0.58.1
+fastapi==0.65.2
 uvicorn==0.11.5
 numpy==1.17.2
 Pillow==9.0.0
